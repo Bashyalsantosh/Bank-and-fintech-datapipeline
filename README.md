@@ -12,6 +12,13 @@ Commercial and retail lending operations in developing financial ecosystems face
 
 This repository implements a **Decoupled ETL / Analytics Pipeline** that ingests raw banking client application schemas, normalizes multi-variate risk parameters, and applies an algorithmic scoring engine to output a precise **Sovereign Risk Coefficient Index ($R_c$)** served via a glassmorphic command console.
 
+
+
+
+
+
+
+
 nepal-bank-loan-risk-analytics/
 ├── .github/workflows/ci.yml             # GitHub Actions CI/CD Pipeline
 ├── helm/nepal-bank-risk/                 # Enterprise Helm Chart for K8s
