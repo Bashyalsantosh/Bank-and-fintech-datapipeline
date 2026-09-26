@@ -1,0 +1,26 @@
+replicaCount: 2
+
+image:
+  repository: nepal-bank-risk-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+env:
+  environment: "production"
+  jwtSecretKey: "production-secure-jwt-key"
+  weightDti: "0.40"
+  weightLtv: "0.35"
+  weightPInstances: "0.25"
+  thresholdCritical: "0.75"
+  thresholdWatchlist: "0.45"
+
+postgresql:
+  user: "postgres"
+  password: "secure_password"
+  database: "loan_risk_db"
+  storageSize: "10Gi"
