@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Bank Loan Risk Telemetry Console</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-white flex items-center justify-center p-6">
+
+    <div class="w-full max-w-2xl glass rounded-3xl p-8 shadow-2xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                Nepal Bank Risk Telemetry Console
+            </h1>
+            <p class="text-slate-300 text-sm mt-2">Automated Credit Default Prediction & Sovereign Risk Scoring ($Rc$)</p>
+        </header>
+
+        <form id="riskForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Application ID</label>
+                    <input type="text" id="application_id" value="APP-2026-001" required
+                        class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Debt-to-Income (DTI)</label>
+                    <input type="number" step="0.01" min="0" max="1" id="dti" value="0.45" required
+                        class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Loan-to-Value (LTV)</label>
+                    <input type="number" step="0.01" min="0" max="2" id="ltv" value="0.70" required
+                        class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Past-Due Instances</label>
+                    <input type="number" min="0" id="p_instances" value="1" required
+                        class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 font-bold tracking-wide shadow-lg hover:opacity-90 transition duration-200">
+                Calculate Risk Score ($Rc$)
+            </button>
+        </form>
+
+        <div id="resultContainer" class="mt-8 hidden p-6 rounded-2xl glass border border-slate-700/50">
+            <h2 class="text-lg font-bold text-slate-200 mb-3">Inference Result</h2>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <span class="text-slate-400">Risk Score ($Rc$):</span>
+                    <p id="resScore" class="text-xl font-mono font-bold text-blue-400 mt-1"></p>
+                </div>
+                <div>
+                    <span class="text-slate-400">Regulatory Category:</span>
+                    <p id="resCategory" class="text-lg font-bold mt-1"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('riskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                application_id: document.getElementById('application_id').value,
+                dti: parseFloat(document.getElementById('dti').value),
+                ltv: parseFloat(document.getElementById('ltv').value),
+                p_instances: parseInt(document.getElementById('p_instances').value)
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/v1/predict-risk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('API request failed');
+
+                const data = await response.json();
+                
+                document.getElementById('resScore').innerText = data.rc_score;
+                const catEl = document.getElementById('resCategory');
+                catEl.innerText = data.risk_category;
+                
+                if (data.risk_category.includes('CRITICAL')) {
+                    catEl.className = 'text-lg font-bold mt-1 text-red-400';
+                } else if (data.risk_category.includes('WATCHLIST')) {
+                    catEl.className = 'text-lg font-bold mt-1 text-amber-400';
+                } else {
+                    catEl.className = 'text-lg font-bold mt-1 text-emerald-400';
+                }
+
+                document.getElementById('resultContainer').classList.remove('hidden');
+            } catch (err) {
+                alert('Error connecting to Backend API. Make sure FastAPI is running.');
+            }
+        });
+    </script>
+</body>
+</html>
