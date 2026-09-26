@@ -1,0 +1,32 @@
+import joblib
+import numpy as np
+
+# Load trained ML model at startup (if available)
+MODEL_PATH = "src/ml/risk_xgboost_model.pkl"
+ml_model = None
+if os.path.exists(MODEL_PATH):
+    ml_model = joblib.load(MODEL_PATH)
+
+@app.post("/api/v1/predict-ml-risk")
+def predict_ml_credit_risk(payload: LoanApplicationRequest):
+    """Predicts credit risk using the trained XGBoost ML model."""
+    if ml_model is None:
+        raise HTTPException(status_code=500, detail="ML Model not trained or found on server.")
+    
+    features = np.array([[payload.dti, payload.ltv, payload.p_instances]])
+    default_prob = float(ml_model.predict_proba(features)[0][1])
+    
+    # Categorize based on ML probability threshold
+    if default_prob >= 0.70:
+        category = "CRITICAL DEFAULT RISK"
+    elif default_prob >= 0.40:
+        category = "WATCHLIST ELEVATED"
+    else:
+        category = "PASSABLE LOW RISK"
+        
+    return {
+        "application_id": payload.application_id,
+        "default_probability": round(default_prob, 4),
+        "risk_category": category,
+        "engine": "XGBoost MLOps Pipeline"
+    }
