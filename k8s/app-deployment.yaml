@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nepal-bank-risk-api
+  namespace: default
+  labels:
+    app: nepal-bank-risk-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nepal-bank-risk-api
+  template:
+    metadata:
+      labels:
+        app: nepal-bank-risk-api
+    spec:
+      containers:
+      - name: api
+        image: nepal-bank-risk-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DATABASE_URL
+          value: "postgresql://postgres:secure_password@postgres-service:5432/loan_risk_db"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nepal-bank-risk-service
+  namespace: default
+spec:
+  type: LoadBalancer
+  selector:
+    app: nepal-bank-risk-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
