@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nepal-bank-risk
+description: A Helm chart for Nepal Bank Loan Credit Risk Analytics Engine (FastAPI + PostgreSQL)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
