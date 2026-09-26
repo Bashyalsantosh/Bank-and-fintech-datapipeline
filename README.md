@@ -13,16 +13,16 @@ Commercial and retail lending operations in developing financial ecosystems face
 This repository implements a **Decoupled ETL / Analytics Pipeline** that ingests raw banking client application schemas, normalizes multi-variate risk parameters, and applies an algorithmic scoring engine to output a precise **Sovereign Risk Coefficient Index ($R_c$)** served via a glassmorphic command console.
 
 nepal-bank-loan-risk-analytics/
-├── .github/workflows/ci.yml       # GitHub Actions CI/CD Pipeline
-├── helm/nepal-bank-risk/          # Enterprise Helm Chart for K8s
-├── k8s/                           # Kubernetes Deployment Manifests
-├── frontend/index.html            # Glassmorphic Command Console UI
+├── .github/workflows/ci.yml             # GitHub Actions CI/CD Pipeline
+├── helm/nepal-bank-risk/                 # Enterprise Helm Chart for K8s
+├── k8s/                                 # Kubernetes Deployment Manifests
+├── frontend/index.html                   # Glassmorphic Command Console UI
 ├── src/
-│   ├── config.py                  # Pydantic Configuration
-│   ├── main.py                    # FastAPI REST API (with JWT & Prometheus)
-│   ├── models.py                  # SQLAlchemy PostgreSQL Models
-│   ├── auth.py                    # JWT Authentication Middleware
-│   ├── monitoring.py              # Prometheus Observability Setup
+│   ├── config.py                       # Pydantic Configuration
+│   ├── main.py                         # FastAPI REST API (with JWT & Prometheus)
+│   ├── models.py                       # SQLAlchemy PostgreSQL Models
+│   ├── auth.py                        # JWT Authentication Middleware
+│   ├── monitoring.py                    # Prometheus Observability Setup
 │   ├── pipelines/
 │   │   └── medallion_pipeline.py  # Bronze, Silver, Gold Data Pipeline
 │   └── ml/
